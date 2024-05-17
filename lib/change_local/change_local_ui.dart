@@ -1,7 +1,10 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:gap/gap.dart';
 import 'package:mixes/change_local/change_local_cubit.dart';
 import 'package:mixes/change_local/change_local_state.dart';
+import 'package:mixes/enum/enum.dart';
 import 'package:mixes/home/home_ui.dart';
 import 'package:mixes/main_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,7 +14,7 @@ class ChangeLocalUi extends StatefulWidget {
 
   static const String routeName = "/change_local_ui";
   static Widget builder(BuildContext context) => BlocProvider(
-    create: (context) => ChangeLocalCubit(ChangeLocalState()),
+    create: (context) => ChangeLocalCubit(const ChangeLocalState()),
     child: const ChangeLocalUi(),
   );
 
@@ -22,6 +25,8 @@ class ChangeLocalUi extends StatefulWidget {
 class _SettingUiState extends State<ChangeLocalUi> {
 
   GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  ChangeLocalCubit get cubit => context.read<ChangeLocalCubit>();
+
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +66,42 @@ class _SettingUiState extends State<ChangeLocalUi> {
           ],
         ),
         body: Center(
-          child: ElevatedButton(
-            onPressed: () => Navigator.pushNamed(context, HomeUi.routeName),
-            child: const Text("go"),
+          child: Column(
+            mainAxisSize: MainAxisSize.max,
+            children: [
+              const Text("Please Select Language", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
+              const Gap(20),
+              Flexible(
+                child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: LanguagePicker.values.length,
+                    itemBuilder: (context, index){
+                      return BlocBuilder<ChangeLocalCubit, ChangeLocalState>(
+                      builder: (context, state) {
+                        return RadioListTile(
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          title: Text(LanguagePicker.values[index].name),
+                          value: index,
+                          groupValue: state.index,
+                          onChanged: (val){
+                            cubit.changeRadioButtonIndex(index: index);
+                          }
+                        );
+                       },
+                     );
+                    }
+                ),
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                     SharedPreferences preferences = await SharedPreferences.getInstance();
+                     preferences.setString('local',LanguageCode.values[cubit.state.index].name.toString());
+                     context.read<MainCubit>().getLocal();
+                     Navigator.pushNamed(context, HomeUi.routeName);
+                  },
+                  child: const Text("Next")
+              )
+            ],
           )
         ),
       ),
