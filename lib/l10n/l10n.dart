@@ -7,6 +7,5 @@ class L10n{
     const Locale('gu'),
     const Locale('hi'),
     const Locale('he'),
-    const Locale('om'),
   ];
 }

@@ -25,6 +25,9 @@ class _HomeUiState extends State<HomeUi> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          ),
           body: Center(
             child: Padding(
               padding: const EdgeInsetsDirectional.symmetric(horizontal: 7),

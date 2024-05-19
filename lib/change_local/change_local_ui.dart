@@ -1,4 +1,3 @@
-import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
@@ -19,22 +18,23 @@ class ChangeLocalUi extends StatefulWidget {
   );
 
   @override
-  State<ChangeLocalUi> createState() => _SettingUiState();
+  State<ChangeLocalUi> createState() => _ChangeLocalUiState();
 }
 
-class _SettingUiState extends State<ChangeLocalUi> {
+class _ChangeLocalUiState extends State<ChangeLocalUi> {
 
-  GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+  // GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
   ChangeLocalCubit get cubit => context.read<ChangeLocalCubit>();
-
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          actions: [
-            PopupMenuButton(
+          title: const Text("Select Language"),
+          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+          actions: const[
+            /*  PopupMenuButton(
               icon: const Icon(Icons.language),
               itemBuilder: (context){
                 return const[
@@ -62,23 +62,28 @@ class _SettingUiState extends State<ChangeLocalUi> {
                   print("exception ====> $e");
                 }
               },
-            )
+            )*/
           ],
         ),
         body: Center(
           child: Column(
-            mainAxisSize: MainAxisSize.max,
             children: [
               const Text("Please Select Language", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),),
               const Gap(20),
               Flexible(
-                child: ListView.builder(
+                child: ListView.separated(
                     shrinkWrap: true,
                     itemCount: LanguagePicker.values.length,
+                    separatorBuilder: (context, index){
+                      return Gap(10.0);
+                    },
                     itemBuilder: (context, index){
                       return BlocBuilder<ChangeLocalCubit, ChangeLocalState>(
                       builder: (context, state) {
+
                         return RadioListTile(
+                          // activeColor: Theme.of(context).,
+                          // tileColor: Theme.of(context).colorScheme.secondary,
                           controlAffinity: ListTileControlAffinity.trailing,
                           title: Text(LanguagePicker.values[index].name),
                           value: index,
@@ -87,19 +92,34 @@ class _SettingUiState extends State<ChangeLocalUi> {
                             cubit.changeRadioButtonIndex(index: index);
                           }
                         );
+
                        },
                      );
-                    }
+                   }
                 ),
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                     SharedPreferences preferences = await SharedPreferences.getInstance();
-                     preferences.setString('local',LanguageCode.values[cubit.state.index].name.toString());
-                     context.read<MainCubit>().getLocal();
-                     Navigator.pushNamed(context, HomeUi.routeName);
-                  },
-                  child: const Text("Next")
+              Padding(
+                padding: const EdgeInsetsDirectional.symmetric(
+                    horizontal: 10.0, vertical: 6.0,
+                ),
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  child: ElevatedButton(
+                      onPressed: () async {
+                         SharedPreferences preferences = await SharedPreferences.getInstance();
+                         preferences.setString('local',LanguageCode.values[cubit.state.index].name.toString());
+                         context.read<MainCubit>().getLocal();
+                         Navigator.pushNamed(context, HomeUi.routeName);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadiusDirectional.circular(10.0)
+                        )
+                      ),
+                      // style: Theme.of(context).elevatedButtonTheme.style,
+                      child: Text("Next", /*style: TextStyle(color: Theme.of(context).primaryColor)*/),
+                  ),
+                ),
               )
             ],
           )

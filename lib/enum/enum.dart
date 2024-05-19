@@ -4,7 +4,6 @@ enum LanguagePicker {
   Gujarati,
   Hindi,
   Hebrew,
-  Oromo,
 }
 
 enum LanguageCode {
@@ -13,5 +12,4 @@ enum LanguageCode {
   gu,
   hi,
   he,
-  om,
 }
